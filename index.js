@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSplitMode = 2; // Mặc định là Chia 2
   const LOCAL_STORAGE_KEY = 'local_settings';
   let hasShownLoginSuccess = false; // Biến cờ để đảm bảo thông báo đăng nhập thành công chỉ hiển thị một lần
-  let currentVersion = localStorage.getItem('appVersion') || '0.0.0'; // Lưu phiên bản hiện tại
+  let currentVersion = null; // Thay cho localStorage.getItem('appVersion') || '0.0.0'
 
   // Biến để theo dõi thời gian không hoạt động
   let inactivityTimeout;
