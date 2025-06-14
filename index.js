@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const translations = {
     vn: {
       appTitle: 'Tiện Ích Của Trịnh Hg',
-      contactText1: '– Gia hạn tài khoản: ',
+      contactText1: 'Gia hạn tài khoản: ',
       settingsTab: 'Settings',
       replaceTab: 'Replace',
       splitTab: 'Chia Chương',
