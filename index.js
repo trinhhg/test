@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Kiểm tra phiên bản mới từ version.json
   function checkForUpdates() {
-    fetch('https://github.com/trinhhg/test/blob/main/version.json')
+    fetch('https://raw.githubusercontent.com/trinhhg/test/main/version.json')
       .then(response => {
         if (!response.ok) throw new Error('Không thể tải version.json');
         return response.json();
