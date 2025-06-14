@@ -157,14 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((docSnap) => {
         if (docSnap.exists) {
           const userData = docSnap.data();
-          const expiresAt = new Date(userData.expiresAt);
+          const expiry = new Date(userData.expiry); // Sử dụng trường expiry
           const now = new Date();
           if (userData.disabled) {
             showNotification(translations[currentLang].accountDisabled, 'error');
             auth.signOut();
             showLoginUI();
             return false;
-          } else if (now > expiresAt) {
+          } else if (now > expiry) {
             showNotification(translations[currentLang].accountExpired, 'error');
             auth.signOut();
             showLoginUI();
@@ -233,30 +233,64 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(checkForUpdates, 30000);
   checkForUpdates(); // Kiểm tra ngay khi tải trang
 
-  // Kiểm tra trạng thái tài khoản định kỳ (mỗi 7 giây)
+  // Theo dõi trạng thái tài khoản bằng onSnapshot
   function startAccountStatusCheck() {
-    setInterval(() => {
-      const user = auth.currentUser;
-      if (user) {
-        user.getIdTokenResult().then((idTokenResult) => {
-          if (idTokenResult.claims.disabled) {
-            console.log('Tài khoản bị vô hiệu hóa, đang tải lại trang...');
+    const user = auth.currentUser;
+    if (!user) {
+      console.log('Không có người dùng để theo dõi trạng thái');
+      return;
+    }
+
+    user.getIdTokenResult().then((idTokenResult) => {
+      if (idTokenResult.claims.disabled) {
+        console.log('Tài khoản bị vô hiệu hóa, đang tải lại trang...');
+        showNotification(translations[currentLang].accountDisabled, 'error');
+        auth.signOut();
+        window.location.reload();
+      } else {
+        const userDocRef = db.collection("users").doc(user.uid);
+        userDocRef.onSnapshot((doc) => {
+          if (!doc.exists) {
+            console.log('Tài khoản không tồn tại');
+            showNotification(translations[currentLang].noAccountData, 'error');
+            auth.signOut();
+            showLoginUI();
+            window.location.reload();
+            return;
+          }
+
+          const userData = doc.data();
+          const expiry = new Date(userData.expiry); // Sử dụng trường expiry
+          const now = new Date();
+
+          if (userData.disabled) {
+            console.log('Tài khoản bị vô hiệu hóa (disabled: true)');
             showNotification(translations[currentLang].accountDisabled, 'error');
             auth.signOut();
+            showLoginUI();
             window.location.reload();
-          } else {
-            checkAccountStatus(user.uid).then((valid) => {
-              if (!valid) {
-                console.log('Tài khoản không hợp lệ, đang tải lại trang...');
-                window.location.reload();
-              }
-            });
+          } else if (now > expiry) {
+            console.log('Tài khoản đã hết hạn');
+            showNotification(translations[currentLang].accountExpired, 'error');
+            auth.signOut();
+            showLoginUI();
+            window.location.reload();
           }
-        }).catch((error) => {
-          console.error("Lỗi khi kiểm tra token định kỳ:", error);
+        }, (error) => {
+          console.error('Lỗi khi theo dõi tài liệu Firestore:', error);
+          showNotification(translations[currentLang].accountCheckError, 'error');
+          auth.signOut();
+          showLoginUI();
+          window.location.reload();
         });
       }
-    }, 7000); // 7 giây
+    }).catch((error) => {
+      console.error("Lỗi khi kiểm tra token:", error);
+      showNotification(translations[currentLang].accountCheckError, 'error');
+      auth.signOut();
+      showLoginUI();
+      window.location.reload();
+    });
   }
 
   // Theo dõi trạng thái đăng nhập và kiểm tra tài khoản
@@ -277,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (valid) {
               monitorAccountActiveStatus(user.uid); // Bắt đầu theo dõi active
               showMainUI();
-              startAccountStatusCheck(); // Bắt đầu kiểm tra định kỳ
+              startAccountStatusCheck(); // Bắt đầu kiểm tra bằng onSnapshot
             } else {
               window.location.reload();
             }
@@ -345,11 +379,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       if (typeof str !== 'string') return '';
       const htmlEntities = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
+        '&': '&',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '''
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
@@ -475,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateButtonStates() {
     const matchCaseButton = document.getElementById('match-case');
     if (matchCaseButton) {
-      matchCaseButton.textContent = matchCaseEnabled ? translations[currentLang].matchCaseOn : translations[currentLang].matchCaseOff;
+      matchCaseButton.textContent = matchCaseEnabled ? translations[currentLang].matchCaseOn : translations[lang].matchCaseOff;
       matchCaseButton.style.background = matchCaseEnabled ? '#28a745' : '#6c757d';
     } else {
       console.error('Không tìm thấy nút Match Case');
