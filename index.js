@@ -210,28 +210,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Kiểm tra phiên bản mới từ version.json
-  function checkForUpdates() {
-    fetch('https://raw.githubusercontent.com/trinhhg/test/main/version.json')
-      .then(response => {
-        if (!response.ok) throw new Error('Không thể tải version.json');
-        return response.json();
-      })
-      .then(data => {
-        const newVersion = data.version;
-        if (newVersion && newVersion !== currentVersion) {
-          console.log(`Phiên bản mới phát hiện: ${newVersion} (hiện tại: ${currentVersion})`);
-          localStorage.setItem('appVersion', newVersion);
-          window.location.reload();
-        }
-      })
-      .catch(error => {
-        console.error('Lỗi khi kiểm tra phiên bản:', error);
-      });
+async function checkVersionLoop() {
+  try {
+    const response = await fetch('/version.json?v=' + Date.now(), {
+      cache: 'no-store'
+    });
+    const data = await response.json();
+
+    if (!currentVersion) {
+      currentVersion = data.version;
+    } else if (data.version !== currentVersion) {
+      console.log('New version detected. Reloading...');
+      location.reload();
+    }
+  } catch (err) {
+    console.error('Version check failed:', err);
   }
 
-  // Bắt đầu kiểm tra phiên bản mỗi 30 giây
-  setInterval(checkForUpdates, 30000);
-  checkForUpdates(); // Kiểm tra ngay khi tải trang
+  setTimeout(checkVersionLoop, 10000); // 10s
+}
+
+// Gọi hàm bắt đầu vòng lặp
+checkVersionLoop();
 
   // Theo dõi trạng thái tài khoản bằng onSnapshot
   function startAccountStatusCheck() {
