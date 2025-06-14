@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Kiểm tra phiên bản mới từ version.json
+ // Hàm kiểm tra version từ version.json
 async function checkVersionLoop() {
   try {
     const response = await fetch('https://raw.githubusercontent.com/trinhhg/test/main/version.json?' + Date.now(), {
@@ -218,19 +218,21 @@ async function checkVersionLoop() {
     const data = await response.json();
 
     if (!currentVersion) {
+      console.log('📌 Phiên bản hiện tại:', data.version);
       currentVersion = data.version;
     } else if (data.version !== currentVersion) {
-      console.log('New version detected. Reloading...');
+      console.log('🔄 New version detected. Reloading...');
       location.reload();
     }
   } catch (err) {
-    console.error('Version check failed:', err);
+    console.error('❌ Version check failed:', err);
   }
 
-  setTimeout(checkVersionLoop, 10000); // 10s
+  // Lặp lại sau 5 giây
+  setTimeout(checkVersionLoop, 5000);
 }
 
-// Gọi hàm bắt đầu vòng lặp
+// Gọi hàm bắt đầu kiểm tra phiên bản
 checkVersionLoop();
 
   // Theo dõi trạng thái tài khoản bằng onSnapshot
