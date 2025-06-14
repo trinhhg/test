@@ -383,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '<': '<',
         '>': '>',
         '"': '"',
-        "'": '&apos;'
+        "'": '''
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateButtonStates() {
     const matchCaseButton = document.getElementById('match-case');
     if (matchCaseButton) {
-      matchCaseButton.textContent = matchCaseEnabled ? translations[currentLang].matchCaseOn : translations[lang].matchCaseOff;
+      matchCaseButton.textContent = matchCaseEnabled ? translations[currentLang].matchCaseOn : translations[currentLang].matchCaseOff;
       matchCaseButton.style.background = matchCaseEnabled ? '#28a745' : '#6c757d';
     } else {
       console.error('Không tìm thấy nút Match Case');
@@ -1195,7 +1195,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const selectedTab = document.getElementById(tabName);
         if (selectedTab) {
           selectedTab.classList.add('active');
-          console.log(`Tab ${tabName} đã được kích hoạt`);
+          console.log(`Tab ${tabName} đã được hiển thị`);
         } else {
           console.error(`Không tìm thấy tab với ID ${tabName}`);
         }
