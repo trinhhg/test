@@ -465,7 +465,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentMode !== 'default' && renameMode && deleteMode) {
       renameMode.style.display = 'inline-block';
       deleteMode.style.display = 'inline-block';
-    }
     } else if (renameMode && deleteMode) {
       renameMode.style.display = 'none';
       deleteMode.style.display = 'none';
