@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '<': '<',
         '>': '>',
         '"': '"',
-        "'": '''
+        "'": '&apos;'
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
