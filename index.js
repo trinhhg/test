@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Kiểm tra phiên bản mới từ version.json
 async function checkVersionLoop() {
   try {
-    const response = await fetch('https://raw.githubusercontent.com/trinhhg/test/main/version.json' + Date.now(), {
+    const response = await fetch('https://raw.githubusercontent.com/trinhhg/test/main/version.json?' + Date.now(), {
       cache: 'no-store'
     });
     const data = await response.json();
