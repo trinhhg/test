@@ -135,18 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector(".login-container").style.display = "flex";
   }
 
-  // Hàm hin th trng thi loading
+  // Hàm hiển thị trạng thái loading
   function showLoadingUI() {
     document.querySelector(".container").style.display = "none";
     document.querySelector(".login-container").style.display = "none";
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'loading';
-    loadingDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%; font-size: 16px; color: #333;';
+    loadingDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; color: #333;';
     loadingDiv.textContent = translations[currentLang].loading;
     document.body.appendChild(loadingDiv);
   }
 
-  // H xó m trm áãng nhạp
+  // Hàm xóa màn hình loading
   function hideLoadingUI() {
     const loadingDiv = document.getElementById('loading');
     if (loadingDiv) loadingDiv.remove();
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoginUI();
         return false;
       }
-    }).catch((error) {
+    }).catch((error) => {
       console.error("Lỗi khi kiểm tra tài khoản:", error);
       showNotification(translations[currentLang].accountCheckError, 'error');
       auth.signOut();
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Theo dõi trường active từ Firestore
   function monitorAccountActiveStatus(uid) {
     const userDocRef = db.collection("users").doc(uid);
-    userDocRef.onSnapshot((doc) {
+    userDocRef.onSnapshot((doc) => {
       if (!doc.exists || doc.data().active === false) {
         console.log('Tài khoản không tồn tại hoặc đã bị vô hiệu hóa (active: false)');
         auth.signOut().then(() => {
@@ -198,12 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
           showLoginUI();
           window.location.reload();
         }).catch((error) => {
-          console.error('Lỗi khi đăng xuất:', error));
+          console.error('Lỗi khi đăng xuất:', error);
           showNotification('Lỗi khi đăng xuất.', 'error');
         });
       }
     }, (error) => {
-      console.error('Lỗi khi theo dõi tài liệu Firestore:', error));
+      console.error('Lỗi khi theo dõi tài liệu Firestore:', error);
       showNotification(translations[currentLang].accountCheckError, 'error');
     });
   }
@@ -236,10 +236,11 @@ document.addEventListener('DOMContentLoaded', () => {
     dialog.style.maxWidth = '400px';
     dialog.style.width = '90%';
     dialog.style.textAlign = 'center';
+
     // Tiêu đề
     const title = document.createElement('h3');
     title.textContent = 'Thông báo từ trinhhg.github.io';
-    title.style.margin = '0 0 10px 0 dialog';
+    title.style.margin = '0 0 10px 0';
     dialog.appendChild(title);
 
     // Nội dung
@@ -255,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
     reloadButton.style.padding = '10px 20px';
     reloadButton.style.backgroundColor = '#007bff';
     reloadButton.style.color = '#fff';
-    reloadButton.style.border = '4px';
+    reloadButton.style.border = 'none';
     reloadButton.style.borderRadius = '5px';
     reloadButton.style.cursor = 'pointer';
     reloadButton.style.marginTop = '10px';
@@ -276,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Kiểm tra phiên bản mới từ version.json và build.txt
+  // Kiểm tra phiên bản mới từ version.json
   async function checkVersionLoop() {
     try {
       const baseURL = 'https://trinhhg.github.io/test';
@@ -290,7 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!currentVersion) {
         currentVersion = versionData.version;
-        console.log("📌ng hiện tại: " + currentVersion);
+        console.log("📌 Phiên bản hiện tại: " + currentVersion);
       } else if (versionData.version !== currentVersion) {
         // Delay 6 phút (360,000 ms) trước khi hiển thị hộp thoại
         setTimeout(() => {
@@ -459,11 +460,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       if (typeof str !== 'string') return '';
       const htmlEntities = {
-        '&': '&',
-        '<': '<',
-        '>': '>',
-        '"': '"',
-        "'": '''
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
