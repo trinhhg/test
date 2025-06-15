@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function checkVersionLoop() {
     try {
       // Fetch version.json
-      const versionResponse = await fetch('/version.json?' + Date.now(), {
+      const versionResponse = await fetch('https://github.com/trinhhg/test/version.json?' + Date.now(), {
         cache: 'no-store'
       });
       if (!versionResponse.ok) throw new Error('Không thể tải version.json');
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("📌 Phiên bản hiện tại: " + currentVersion);
       } else if (versionData.version !== currentVersion) {
         // Fetch build.txt để xác nhận deploy
-        const buildResponse = await fetch('/build.txt?' + Date.now(), {
+        const buildResponse = await fetch('https://github.com/trinhhg/test/build.txt?' + Date.now(), {
           cache: 'no-store'
         });
         if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
