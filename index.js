@@ -424,39 +424,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Hàm thay thế văn bản mới
-  function replaceText(inputText, pairs, matchCase) {
-    let outputText = inputText;
-    const punctuation = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
-    const spaceRegex = /\s+/g;
+ function replaceText(inputText, pairs, matchCase) {
+  let outputText = inputText;
+  
+  pairs.forEach(pair => {
+    let find = pair.find;
+    let replace = pair.replace !== null ? pair.replace : '';
+    if (!find) return;
 
-    pairs.forEach(pair => {
-      let find = pair.find.trim();
-      let replace = pair.replace !== null ? pair.replace.trim() : '';
-      if (!find) return;
+    // Thoát các ký tự đặc biệt trong chuỗi tìm kiếm
+    const escapedFind = escapeRegExp(find);
+    // Tạo regex, hỗ trợ matchCase, không dùng boundary
+    const regexFlags = matchCase ? 'g' : 'gi';
+    const regex = new RegExp(escapedFind, regexFlags);
 
-      // Chuẩn hóa chuỗi tìm kiếm để so sánh
-      const findCore = find.replace(punctuation, '').replace(spaceRegex, ' ');
-      const replaceCore = replace.replace(punctuation, '').replace(spaceRegex, ' ');
+    // Thay thế trực tiếp
+    outputText = outputText.replace(regex, replace);
+  });
 
-      // Tạo regex để khớp từ, giữ dấu câu và khoảng trắng
-      const escapedFind = escapeRegExp(find);
-      const regexFlags = matchCase ? 'g' : 'gi';
-      const regex = new RegExp(`(\\s*${escapedFind}\\s*)([${punctuation}\\s]*)`, regexFlags);
-
-      outputText = outputText.replace(regex, (match, word, punct) => {
-        // Giữ khoảng trắng và dấu câu, chỉ thay thế từ
-        const wordTrimmed = word.trim();
-        if (wordTrimmed === find || (!matchCase && wordTrimmed.toLowerCase() === find.toLowerCase())) {
-          return `${word.replace(wordTrimmed, replace)}${punct}`;
-        }
-        return match;
-      });
-    });
-
-    // Định dạng lại đoạn văn
-    const paragraphs = outputText.split('\n').filter(p => p.trim());
-    return paragraphs.join('\n\n');
-  }
+  // Định dạng lại đoạn văn
+  const paragraphs = outputText.split('\n').filter(p => p.trim());
+  return paragraphs.join('\n\n');
+}
 
   function updateLanguage(lang) {
     currentLang = lang;
