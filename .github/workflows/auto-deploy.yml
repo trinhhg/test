@@ -24,9 +24,9 @@ jobs:
           echo "Build: $TIMESTAMP" > build.txt
 
       - name: Commit and push changes
-  run: |
-    git add version.json build.txt
-    git commit -m "🔄 Auto update version to $TIMESTAMP" || echo "Nothing to commit"
-    git push origin HEAD:main
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git add version.json build.txt
+          git commit -m "🔄 Auto update version to $TIMESTAMP" || echo "Nothing to commit"
+          git push origin HEAD:main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
