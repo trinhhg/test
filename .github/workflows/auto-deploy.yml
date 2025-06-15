@@ -1,1 +1,31 @@
+name: Auto Update Version and Build
 
+on:
+  push:
+    branches:
+      - main  # hoặc nhánh bạn deploy từ đó
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Git
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: Update version.json and build.txt
+      run: |
+        TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+        VERSION="1.0.${TIMESTAMP:10}" # ví dụ: tăng patch theo thời gian
+
+        echo "{ \"version\": \"$VERSION\" }" > version.json
+        echo "build: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" > build.txt
+
+        git add version.json build.txt
+        git commit -m "🔄 Auto update version to $VERSION"
+        git push
