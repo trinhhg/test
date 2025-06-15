@@ -263,7 +263,7 @@ textarea::-webkit-scrollbar {
 
 #split-input-text, #output1-text, #output2-text, #output3-text, #output4-text {
   width: 100%;
-  height: 100px;
+  height: 150px; /* Đồng bộ chiều cao */
   padding: 8px;
   font-size: 12px;
   resize: vertical;
@@ -285,7 +285,7 @@ textarea::-webkit-scrollbar {
 
 .word-count {
   font-size: 11px;
-  color: #666666; /* Màu xám đậm hơn */
+  color: #666666;
   text-align: center;
   margin: 5px 0;
 }
@@ -373,6 +373,10 @@ textarea::-webkit-scrollbar {
   background-color: #dc3545;
 }
 
+.notification.info {
+  background-color: #17a2b8;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -414,6 +418,24 @@ textarea::-webkit-scrollbar {
   font-size: 14px;
 }
 
+#pagination-controls:empty {
+  display: none;
+}
+
+#loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 16px;
+  color: #333;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 15px 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+}
+
 @media (max-width: 768px) {
   .split-container {
     flex-wrap: wrap;
@@ -426,6 +448,16 @@ textarea::-webkit-scrollbar {
   }
   .split-container .word-count {
     text-align: center;
+  }
+  .punctuation-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+  .punctuation-item input {
+    width: 100%;
+  }
+  .punctuation-item button {
+    width: 100%;
   }
 }
 
