@@ -214,24 +214,31 @@ document.addEventListener('DOMContentLoaded', () => {
   // Kiểm tra phiên bản mới từ version.json và build.txt
   async function checkVersionLoop() {
     try {
-      // Fetch version.json
-      const versionResponse = await fetch('https://github.com/trinhhg/test/version.json?' + Date.now(), {
-        cache: 'no-store'
-      });
-      if (!versionResponse.ok) throw new Error('Không thể tải version.json');
-      const versionData = await versionResponse.json();
+     const baseURL = 'https://trinhhg.github.io/test';
 
-      if (!currentVersion) {
-        currentVersion = versionData.version;
-        console.log("📌 Phiên bản hiện tại: " + currentVersion);
-      } else if (versionData.version !== currentVersion) {
-        // Fetch build.txt để xác nhận deploy
-        const buildResponse = await fetch('https://github.com/trinhhg/test/build.txt?' + Date.now(), {
-          cache: 'no-store'
-        });
-        if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
-        const buildTime = await buildResponse.text();
-        console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
+try {
+  // Fetch version.json
+  const versionResponse = await fetch(`${baseURL}/version.json?${Date.now()}`, {
+    cache: 'no-store'
+  });
+  if (!versionResponse.ok) throw new Error('Không thể tải version.json');
+  const versionData = await versionResponse.json();
+
+  if (!currentVersion) {
+    currentVersion = versionData.version;
+    console.log("📌 Phiên bản hiện tại: " + currentVersion);
+  } else if (versionData.version !== currentVersion) {
+    // Fetch build.txt để xác nhận deploy
+    const buildResponse = await fetch(`${baseURL}/build.txt?${Date.now()}`, {
+      cache: 'no-store'
+    });
+    if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
+    const buildTime = await buildResponse.text();
+    console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
+  }
+} catch (error) {
+  console.error("🚫 Kiểm tra phiên bản thất bại:", error);
+}
 
         // Hiển thị thông báo cập nhật
         const notification = document.createElement('div');
