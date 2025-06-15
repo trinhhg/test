@@ -84,7 +84,9 @@ document.addEventListener('DOMContentLoaded', () => {
       logoutSuccess: 'Đã đăng xuất thành công!',
       logoutText: 'Đăng xuất',
       loading: 'Đang tải...',
-      accountDeactivated: 'Tài khoản đã bị vô hiệu hóa.'
+      accountDeactivated: 'Tài khoản đã bị vô hiệu hóa.',
+      updateAvailable: 'Đã có bản cập nhật. Nhấn F5 để tải lại.',
+      reloadButton: 'Tải lại ngay'
     }
   };
 
@@ -94,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSplitMode = 2; // Mặc định là Chia 2
   const LOCAL_STORAGE_KEY = 'local_settings';
   let hasShownLoginSuccess = false; // Biến cờ để đảm bảo thông báo đăng nhập thành công chỉ hiển thị một lần
-  let currentVersion = null; // Thay cho localStorage.getItem('appVersion') || '0.0.0'
+  let currentVersion = null; // Biến lưu phiên bản hiện tại
 
   // Biến để theo dõi thời gian không hoạt động
   let inactivityTimeout;
@@ -209,30 +211,58 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
- // Kiểm tra phiên bản mới từ version.json
-async function checkVersionLoop() {
-  try {
-    const response = await fetch('https://trinhhg.github.io/test/version.json?' + Date.now(), {
-      cache: 'no-store'
-    });
-    const data = await response.json();
+  // Kiểm tra phiên bản mới từ version.json và build.txt
+  async function checkVersionLoop() {
+    try {
+      // Fetch version.json
+      const versionResponse = await fetch('/version.json?' + Date.now(), {
+        cache: 'no-store'
+      });
+      if (!versionResponse.ok) throw new Error('Không thể tải version.json');
+      const versionData = await versionResponse.json();
 
-    if (!currentVersion) {
-      currentVersion = data.version;
-      console.log("📌 Phiên bản hiện tại: " + currentVersion);
-    } else if (data.version !== currentVersion) {
-      console.log("🆕 New version detected: " + data.version + " → Reloading...");
-      location.reload(); // Tự f5 lại trang
+      if (!currentVersion) {
+        currentVersion = versionData.version;
+        console.log("📌 Phiên bản hiện tại: " + currentVersion);
+      } else if (versionData.version !== currentVersion) {
+        // Fetch build.txt để xác nhận deploy
+        const buildResponse = await fetch('/build.txt?' + Date.now(), {
+          cache: 'no-store'
+        });
+        if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
+        const buildTime = await buildResponse.text();
+        console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
+
+        // Hiển thị thông báo cập nhật
+        const notification = document.createElement('div');
+        notification.className = 'notification info';
+        notification.style.cssText = 'position: fixed; bottom: 20px; right: 20px; padding: 15px; background: #007bff; color: white; border-radius: 5px; z-index: 1000;';
+        notification.innerHTML = `
+          ${translations[currentLang].updateAvailable}
+          <button id="reload-now" style="margin-left: 10px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+            ${translations[currentLang].reloadButton}
+          </button>
+        `;
+        document.body.appendChild(notification);
+
+        // Sự kiện nhấn nút reload
+        document.getElementById('reload-now').addEventListener('click', () => {
+          window.location.href = window.location.pathname + '?v=' + Date.now();
+        });
+
+        // Không lặp lại kiểm tra sau khi thông báo
+        return;
+      }
+    } catch (err) {
+      console.error('🚫 Kiểm tra phiên bản thất bại:', err);
     }
-  } catch (err) {
-    console.error('🚫 Version check failed:', err);
+
+    // Lặp lại sau 5s
+    setTimeout(checkVersionLoop, 5000);
   }
 
-  // Lặp lại sau mỗi 5s
-  setTimeout(checkVersionLoop, 5000);
-}
-
-checkVersionLoop();
+  // Bắt đầu kiểm tra phiên bản
+  checkVersionLoop();
 
   // Theo dõi trạng thái tài khoản bằng onSnapshot
   function startAccountStatusCheck() {
@@ -384,13 +414,48 @@ checkVersionLoop();
         '<': '<',
         '>': '>',
         '"': '"',
-        "'": '&apos;'
+        "'": '''
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
       console.error('Lỗi trong escapeHtml:', error);
       return str || '';
     }
+  }
+
+  // Hàm thay thế văn bản mới
+  function replaceText(inputText, pairs, matchCase) {
+    let outputText = inputText;
+    const punctuation = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]/g;
+    const spaceRegex = /\s+/g;
+
+    pairs.forEach(pair => {
+      let find = pair.find.trim();
+      let replace = pair.replace !== null ? pair.replace.trim() : '';
+      if (!find) return;
+
+      // Chuẩn hóa chuỗi tìm kiếm để so sánh
+      const findCore = find.replace(punctuation, '').replace(spaceRegex, ' ');
+      const replaceCore = replace.replace(punctuation, '').replace(spaceRegex, ' ');
+
+      // Tạo regex để khớp từ, giữ dấu câu và khoảng trắng
+      const escapedFind = escapeRegExp(find);
+      const regexFlags = matchCase ? 'g' : 'gi';
+      const regex = new RegExp(`(\\s*${escapedFind}\\s*)([${punctuation}\\s]*)`, regexFlags);
+
+      outputText = outputText.replace(regex, (match, word, punct) => {
+        // Giữ khoảng trắng và dấu câu, chỉ thay thế từ
+        const wordTrimmed = word.trim();
+        if (wordTrimmed === find || (!matchCase && wordTrimmed.toLowerCase() === find.toLowerCase())) {
+          return `${word.replace(wordTrimmed, replace)}${punct}`;
+        }
+        return match;
+      });
+    });
+
+    // Định dạng lại đoạn văn
+    const paragraphs = outputText.split('\n').filter(p => p.trim());
+    return paragraphs.join('\n\n');
   }
 
   function updateLanguage(lang) {
@@ -861,7 +926,6 @@ checkVersionLoop();
         }
 
         let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
-        let outputText = inputTextArea.value;
         const modeSettings = settings.modes[currentMode] || { pairs: [], matchCase: false };
         const pairs = modeSettings.pairs || [];
         if (pairs.length === 0) {
@@ -869,54 +933,7 @@ checkVersionLoop();
           return;
         }
 
-        const matchCase = modeSettings.matchCase || false;
-
-        pairs.forEach(pair => {
-          let find = pair.find;
-          let replace = pair.replace !== null ? pair.replace : '';
-          if (!find) return;
-
-          let findCore = find;
-          let replaceCore = replace;
-
-          const quoteRegex = /^(['"]([^'"]*)\1)$/;
-          const findMatch = find.match(quoteRegex);
-          if (findMatch) {
-            findCore = findMatch[2];
-            replaceCore = replace.match(quoteRegex) ? replace.match(quoteRegex)[2] : replace;
-          }
-
-          let regexPattern = escapeRegExp(findCore);
-          const regexFlags = matchCase ? 'g' : 'gi';
-          const regex = new RegExp(regexPattern, regexFlags);
-
-          if (matchCase) {
-            outputText = outputText.replace(regex, (match, offset, string) => {
-              const isStartOfLine = offset === 0 || string[offset - 1] === '\n';
-              const isAfterPeriod = offset > 1 && string.slice(offset - 2, offset).match(/\.\s*/);
-              let finalReplaceCore = replaceCore;
-              if (isStartOfLine || isAfterPeriod) {
-                finalReplaceCore = replaceCore.charAt(0).toUpperCase() + replaceCore.slice(1);
-              }
-              return finalReplaceCore;
-            });
-          } else {
-            outputText = outputText.replace(regex, replaceCore);
-          }
-        });
-
-        pairs.forEach(pair => {
-          let find = pair.find;
-          let replace = pair.replace !== null ? pair.replace : '';
-          if (!find) return;
-
-          let regexPattern = escapeRegExp(find);
-          const regex = new RegExp(regexPattern, matchCase ? 'g' : 'gi');
-          outputText = outputText.replace(regex, replace);
-        });
-
-        const paragraphs = outputText.split('\n').filter(p => p.trim());
-        outputText = paragraphs.join('\n\n');
+        const outputText = replaceText(inputTextArea.value, pairs, modeSettings.matchCase);
 
         const outputTextArea = document.getElementById('output-text');
         if (outputTextArea) {
