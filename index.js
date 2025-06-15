@@ -85,8 +85,8 @@ document.addEventListener('DOMContentLoaded', () => {
       logoutText: 'Đăng xuất',
       loading: 'Đang tải...',
       accountDeactivated: 'Tài khoản đã bị vô hiệu hóa.',
-      updateAvailable: 'Đã có bản cập nhật. Nhấn F5 để tải lại.',
-      reloadButton: 'Tải lại ngay'
+      updateAvailable: 'trinhhg.github.io cho biết: Trang đã có phiên bản mới. Bấm "Tải lại" hoặc nhấn F5 để cập nhật.',
+      reloadButton: 'Tải lại'
     }
   };
 
@@ -135,18 +135,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelector(".login-container").style.display = "flex";
   }
 
-  // Hàm hiển thị trạng thái loading
+  // Hàm hin th trng thi loading
   function showLoadingUI() {
     document.querySelector(".container").style.display = "none";
     document.querySelector(".login-container").style.display = "none";
     const loadingDiv = document.createElement('div');
     loadingDiv.id = 'loading';
-    loadingDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; color: #333;';
+    loadingDiv.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%; font-size: 16px; color: #333;';
     loadingDiv.textContent = translations[currentLang].loading;
     document.body.appendChild(loadingDiv);
   }
 
-  // Hàm xóa trạng thái loading
+  // H xó m trm áãng nhạp
   function hideLoadingUI() {
     const loadingDiv = document.getElementById('loading');
     if (loadingDiv) loadingDiv.remove();
@@ -155,45 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hàm kiểm tra trạng thái tài khoản
   function checkAccountStatus(uid) {
     const userDocRef = db.collection("users").doc(uid);
-    return userDocRef.get()
-      .then((docSnap) => {
-        if (docSnap.exists) {
-          const userData = docSnap.data();
-          const expiry = new Date(userData.expiry); // Sử dụng trường expiry
-          const now = new Date();
-          if (userData.disabled) {
-            showNotification(translations[currentLang].accountDisabled, 'error');
-            auth.signOut();
-            showLoginUI();
-            return false;
-          } else if (now > expiry) {
-            showNotification(translations[currentLang].accountExpired, 'error');
-            auth.signOut();
-            showLoginUI();
-            return false;
-          } else {
-            return true;
-          }
-        } else {
-          showNotification(translations[currentLang].noAccountData, 'error');
+    return userDocRef.get().then((docSnap) => {
+      if (docSnap.exists) {
+        const userData = docSnap.data();
+        const expiry = new Date(userData.expiry); // Sử dụng trường expiry
+        const now = new Date();
+        if (userData.disabled) {
+          showNotification(translations[currentLang].accountDisabled, 'error');
           auth.signOut();
           showLoginUI();
           return false;
+        } else if (now > expiry) {
+          showNotification(translations[currentLang].accountExpired, 'error');
+          auth.signOut();
+          showLoginUI();
+          return false;
+        } else {
+          return true;
         }
-      })
-      .catch((error) => {
-        console.error("Lỗi khi kiểm tra tài khoản:", error);
-        showNotification(translations[currentLang].accountCheckError, 'error');
+      } else {
+        showNotification(translations[currentLang].noAccountData, 'error');
         auth.signOut();
         showLoginUI();
         return false;
-      });
+      }
+    }).catch((error) {
+      console.error("Lỗi khi kiểm tra tài khoản:", error);
+      showNotification(translations[currentLang].accountCheckError, 'error');
+      auth.signOut();
+      return false;
+    });
   }
 
   // Theo dõi trường active từ Firestore
   function monitorAccountActiveStatus(uid) {
     const userDocRef = db.collection("users").doc(uid);
-    userDocRef.onSnapshot((doc) => {
+    userDocRef.onSnapshot((doc) {
       if (!doc.exists || doc.data().active === false) {
         console.log('Tài khoản không tồn tại hoặc đã bị vô hiệu hóa (active: false)');
         auth.signOut().then(() => {
@@ -201,13 +198,81 @@ document.addEventListener('DOMContentLoaded', () => {
           showLoginUI();
           window.location.reload();
         }).catch((error) => {
-          console.error('Lỗi khi đăng xuất:', error);
+          console.error('Lỗi khi đăng xuất:', error));
           showNotification('Lỗi khi đăng xuất.', 'error');
         });
       }
     }, (error) => {
-      console.error('Lỗi khi theo dõi tài liệu Firestore:', error);
+      console.error('Lỗi khi theo dõi tài liệu Firestore:', error));
       showNotification(translations[currentLang].accountCheckError, 'error');
+    });
+  }
+
+  // Hiển thị hộp thoại thông báo cập nhật phiên bản mới
+  function showUpdateDialog() {
+    // Tạo overlay để làm mờ nền
+    const overlay = document.createElement('div');
+    overlay.id = 'update-overlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.zIndex = '10000';
+
+    // Tạo hộp thoại
+    const dialog = document.createElement('div');
+    dialog.id = 'update-dialog';
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.backgroundColor = '#fff';
+    dialog.style.padding = '20px';
+    dialog.style.borderRadius = '8px';
+    dialog.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    dialog.style.zIndex = '10001';
+    dialog.style.maxWidth = '400px';
+    dialog.style.width = '90%';
+    dialog.style.textAlign = 'center';
+    // Tiêu đề
+    const title = document.createElement('h3');
+    title.textContent = 'Thông báo từ trinhhg.github.io';
+    title.style.margin = '0 0 10px 0 dialog';
+    dialog.appendChild(title);
+
+    // Nội dung
+    const message = document.createElement('p');
+    message.textContent = translations[currentLang].updateAvailable;
+    message.style.margin = '20px 0';
+    dialog.appendChild(message);
+
+    // Nút Tải lại
+    const reloadButton = document.createElement('button');
+    reloadButton.id = 'reload-btn';
+    reloadButton.textContent = translations[currentLang].reloadButton;
+    reloadButton.style.padding = '10px 20px';
+    reloadButton.style.backgroundColor = '#007bff';
+    reloadButton.style.color = '#fff';
+    reloadButton.style.border = '4px';
+    reloadButton.style.borderRadius = '5px';
+    reloadButton.style.cursor = 'pointer';
+    reloadButton.style.marginTop = '10px';
+    reloadButton.addEventListener('click', () => {
+      console.log('Người dùng nhấn Tải lại');
+      window.location.href = window.location.pathname + '?v=' + Date.now();
+    });
+    dialog.appendChild(reloadButton);
+
+    // Thêm vào body
+    document.body.appendChild(overlay);
+    document.body.appendChild(dialog);
+
+    // Xử lý khi click ngoài hộp thoại
+    overlay.addEventListener('click', () => {
+      overlay.remove();
+      dialog.remove();
     });
   }
 
@@ -225,34 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!currentVersion) {
         currentVersion = versionData.version;
-        console.log("📌 Phiên bản hiện tại: " + currentVersion);
+        console.log("📌ng hiện tại: " + currentVersion);
       } else if (versionData.version !== currentVersion) {
-        // Fetch build.txt để xác nhận deploy
-        const buildResponse = await fetch(`${baseURL}/build.txt?${Date.now()}`, {
-          cache: 'no-store'
-        });
-        if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
-        const buildTime = await buildResponse.text();
-        console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
-
-        // Hiển thị thông báo cập nhật
-        const notification = document.createElement('div');
-        notification.className = 'notification info';
-        notification.style.cssText = 'position: fixed; bottom: 20px; right: 20px; padding: 15px; background: #007bff; color: white; border-radius: 5px; z-index: 1000;';
-        notification.innerHTML = `
-          ${translations[currentLang].updateAvailable}
-          <button id="reload-now" style="margin-left: 10px; padding: 5px 10px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
-            ${translations[currentLang].reloadButton}
-          </button>
-        `;
-        document.body.appendChild(notification);
-
-        // Sự kiện nhấn nút reload
-        document.getElementById('reload-now').addEventListener('click', () => {
-          window.location.href = window.location.pathname + '?v=' + Date.now();
-        });
-
-        // Không lặp lại kiểm tra sau khi thông báo
+        // Delay 6 phút (360,000 ms) trước khi hiển thị hộp thoại
+        setTimeout(() => {
+          console.log("🆕 Phát hiện phiên bản mới sau 6 phút:", versionData.version);
+          showUpdateDialog();
+        }, 360000); // 6 phút
+        // Không lặp lại kiểm tra sau khi phát hiện phiên bản mới
         return;
       }
 
@@ -414,11 +459,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       if (typeof str !== 'string') return '';
       const htmlEntities = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;'
+        '&': '&',
+        '<': '<',
+        '>': '>',
+        '"': '"',
+        "'": '''
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
