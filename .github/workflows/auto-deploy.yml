@@ -1,28 +1,30 @@
-name: Update version and build
+name: Update version and build files
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Cho phép chạy thủ công để test
 
 jobs:
   update-files:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Update version.json and build.txt
-      run: |
-        TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
-        echo "{\"version\": \"$TIMESTAMP\"}" > version.json
-        echo "Build time: $TIMESTAMP" > build.txt
+      - name: Set up Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-    - name: Push changes
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "github-actions[bot]@users.noreply.github.com"
-        git add version.json build.txt
-        git commit -m "🔄 Auto update version to $TIMESTAMP" || echo "Nothing to commit"
-        git push https://x-access-token:${{ secrets.testphu }}@github.com/${{ github.repository }}.git HEAD:main
+      - name: Generate version.json and build.txt
+        run: |
+          TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+          echo "{\"version\":\"$TIMESTAMP\"}" > version.json
+          echo "Build: $TIMESTAMP" > build.txt
+
+      - name: Commit and push changes
+        run: |
+          git add version.json build.txt
+          git commit -m "🔄 Auto update version to $TIMESTAMP" || echo "Nothing to commit"
+          git push https://x-access-token:${{ secrets.testphu }}@github.com/${{ github.repository }}.git HEAD:main
