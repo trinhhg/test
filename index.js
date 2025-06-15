@@ -214,31 +214,26 @@ document.addEventListener('DOMContentLoaded', () => {
   // Kiểm tra phiên bản mới từ version.json và build.txt
   async function checkVersionLoop() {
     try {
-     const baseURL = 'https://trinhhg.github.io/test';
+      const baseURL = 'https://trinhhg.github.io/test';
 
-try {
-  // Fetch version.json
-  const versionResponse = await fetch(`${baseURL}/version.json?${Date.now()}`, {
-    cache: 'no-store'
-  });
-  if (!versionResponse.ok) throw new Error('Không thể tải version.json');
-  const versionData = await versionResponse.json();
+      // Fetch version.json
+      const versionResponse = await fetch(`${baseURL}/version.json?${Date.now()}`, {
+        cache: 'no-store'
+      });
+      if (!versionResponse.ok) throw new Error('Không thể tải version.json');
+      const versionData = await versionResponse.json();
 
-  if (!currentVersion) {
-    currentVersion = versionData.version;
-    console.log("📌 Phiên bản hiện tại: " + currentVersion);
-  } else if (versionData.version !== currentVersion) {
-    // Fetch build.txt để xác nhận deploy
-    const buildResponse = await fetch(`${baseURL}/build.txt?${Date.now()}`, {
-      cache: 'no-store'
-    });
-    if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
-    const buildTime = await buildResponse.text();
-    console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
-  }
-} catch (error) {
-  console.error("🚫 Kiểm tra phiên bản thất bại:", error);
-}
+      if (!currentVersion) {
+        currentVersion = versionData.version;
+        console.log("📌 Phiên bản hiện tại: " + currentVersion);
+      } else if (versionData.version !== currentVersion) {
+        // Fetch build.txt để xác nhận deploy
+        const buildResponse = await fetch(`${baseURL}/build.txt?${Date.now()}`, {
+          cache: 'no-store'
+        });
+        if (!buildResponse.ok) throw new Error('Không thể tải build.txt');
+        const buildTime = await buildResponse.text();
+        console.log("🆕 Phát hiện phiên bản mới: " + versionData.version + ", Build: " + buildTime);
 
         // Hiển thị thông báo cập nhật
         const notification = document.createElement('div');
@@ -260,12 +255,14 @@ try {
         // Không lặp lại kiểm tra sau khi thông báo
         return;
       }
+
+      // Lặp lại sau 5s nếu không có cập nhật
+      setTimeout(checkVersionLoop, 5000);
     } catch (err) {
       console.error('🚫 Kiểm tra phiên bản thất bại:', err);
+      // Tiếp tục lặp lại dù có lỗi
+      setTimeout(checkVersionLoop, 5000);
     }
-
-    // Lặp lại sau 5s
-    setTimeout(checkVersionLoop, 5000);
   }
 
   // Bắt đầu kiểm tra phiên bản
@@ -417,11 +414,11 @@ try {
     try {
       if (typeof str !== 'string') return '';
       const htmlEntities = {
-        '&': '&',
-        '<': '<',
-        '>': '>',
-        '"': '"',
-        "'": '&apos;'
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
       };
       return str.replace(/[&<>"']/g, match => htmlEntities[match]);
     } catch (error) {
@@ -430,29 +427,29 @@ try {
     }
   }
 
-  // Hàm thay thế văn bản mới
- function replaceText(inputText, pairs, matchCase) {
-  let outputText = inputText;
-  
-  pairs.forEach(pair => {
-    let find = pair.find;
-    let replace = pair.replace !== null ? pair.replace : '';
-    if (!find) return;
+  // Hàm thay thế văn bản
+  function replaceText(inputText, pairs, matchCase) {
+    let outputText = inputText;
+    
+    pairs.forEach(pair => {
+      let find = pair.find;
+      let replace = pair.replace !== null ? pair.replace : '';
+      if (!find) return;
 
-    // Thoát các ký tự đặc biệt trong chuỗi tìm kiếm
-    const escapedFind = escapeRegExp(find);
-    // Tạo regex, hỗ trợ matchCase, không dùng boundary
-    const regexFlags = matchCase ? 'g' : 'gi';
-    const regex = new RegExp(escapedFind, regexFlags);
+      // Thoát các ký tự đặc biệt trong chuỗi tìm kiếm
+      const escapedFind = escapeRegExp(find);
+      // Tạo regex, hỗ trợ matchCase, không dùng boundary
+      const regexFlags = matchCase ? 'g' : 'gi';
+      const regex = new RegExp(escapedFind, regexFlags);
 
-    // Thay thế trực tiếp
-    outputText = outputText.replace(regex, replace);
-  });
+      // Thay thế trực tiếp
+      outputText = outputText.replace(regex, replace);
+    });
 
-  // Định dạng lại đoạn văn
-  const paragraphs = outputText.split('\n').filter(p => p.trim());
-  return paragraphs.join('\n\n');
-}
+    // Định dạng lại đoạn văn
+    const paragraphs = outputText.split('\n').filter(p => p.trim());
+    return paragraphs.join('\n\n');
+  }
 
   function updateLanguage(lang) {
     currentLang = lang;
