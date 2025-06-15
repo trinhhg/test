@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Biến để theo dõi thời gian không hoạt động
   let inactivityTimeout;
-  const INACTIVITY_LIMIT = 2400000; // 40 phút (2,400,000 ms)
+  const INACTIVITY_LIMIT = 60000; // 40 phút (2,400,000 ms)
 
   // Hàm reset bộ đếm thời gian không hoạt động
   function resetInactivityTimer() {
