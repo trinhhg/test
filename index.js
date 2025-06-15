@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const translations = {
     vn: {
       appTitle: 'Tiện Ích Của Trịnh Hg',
-      contactText1: '- Gia hạn tài khoản: ',
+      contactText1: 'Gia hạn tài khoản: ',
       settingsTab: 'Settings',
       replaceTab: 'Replace',
       splitTab: 'Chia Chương',
@@ -262,7 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
     reloadButton.style.marginTop = '10px';
     reloadButton.addEventListener('click', () => {
       console.log('Người dùng nhấn Tải lại');
-      window.location.href = window.location.pathname + '?v=' + Date.now();
+      const userConfirmed = confirm("🔄 Trang đã có phiên bản mới.\nNhấn OK hoặc bấm F5 để tải lại.");
+      if (userConfirmed) {
+        location.href = location.pathname + '?v=' + Date.now(); // Cache-busting
+      }
     });
     dialog.appendChild(reloadButton);
 
