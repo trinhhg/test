@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let lastActivity = Date.now(); // Thời gian hoạt động cuối cùng
 
   // Biến để theo dõi thời gian không hoạt động
-  const INACTIVITY_LIMIT = 60000; // 1 phút (60,000 ms)
+  const INACTIVITY_LIMIT = 1800000; // 30 phút (1,800,000 ms)
   const CHECK_INTERVAL = 10000; // Kiểm tra mỗi 10s
 
   // Lưu trạng thái input vào localStorage
