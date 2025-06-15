@@ -1,13 +1,13 @@
-name: Update version and build files
+name: Auto Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  update-files:
+  deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -19,7 +19,7 @@ jobs:
 
       - name: Generate version.json and build.txt
         run: |
-          TIMESTAMP=$(date -u +"%Y%m%d%H%M%S")
+          TIMESTAMP=$(date -u "+%Y%m%d%H%M%S")
           echo "{\"version\":\"$TIMESTAMP\"}" > version.json
           echo "Build: $TIMESTAMP" > build.txt
 
@@ -27,4 +27,4 @@ jobs:
         run: |
           git add version.json build.txt
           git commit -m "🔄 Auto update version to $TIMESTAMP" || echo "Nothing to commit"
-         git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/trinhhg/test.git HEAD:main
+          git push https://x-access-token:${{ secrets.testphu }}@github.com/trinhhg/test.git HEAD:main
