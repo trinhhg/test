@@ -1,11 +1,12 @@
 // src/events/buttons.js
-import { translations, getCurrentLang, setMatchCaseEnabled } from '../i18n/translations.js';
+import { translations, getCurrentLang, setMatchCaseEnabled, getMatchCaseEnabled } from '../i18n/translations.js';
 import { showNotification } from '../ui/notifications.js';
-import { saveSettings, exportSettings, importSettings } from '../settings/settings.js';
-import { addMode, copyMode, deleteMode, renameMode } from '../settings/modes.js';
+import { saveSettings, exportSettings, importSettings, addPair } from '../settings/settings.js';
+import { addMode, copyMode, deleteMode, renameMode, currentMode } from '../settings/modes.js';
 import { handleReplace } from '../text/replace.js';
-import { handleSplit } from '../text/split.js';
+import { handleSplit, updateSplitModeUI } from '../text/split.js';
 import { updateWordCount } from '../utils/wordCount.js';
+import { saveInputState } from '../state/inputState.js';
 
 export function attachButtonEvents() {
   const buttons = {
@@ -46,7 +47,7 @@ export function attachButtonEvents() {
     buttons.matchCaseButton.addEventListener('click', () => {
       setMatchCaseEnabled(!getMatchCaseEnabled());
       updateButtonStates();
-      saveSettings();
+      saveSettings(currentMode, getMatchCaseEnabled());
     });
   }
 
@@ -82,7 +83,9 @@ export function attachButtonEvents() {
   }
 
   if (buttons.saveSettingsButton) {
-    buttons.saveSettingsButton.addEventListener('click', saveSettings);
+    buttons.saveSettingsButton.addEventListener('click', () => {
+      saveSettings(currentMode, getMatchCaseEnabled());
+    });
   }
 
   if (buttons.inputText) {
@@ -111,7 +114,7 @@ export function attachButtonEvents() {
   });
 
   if (buttons.replaceButton) {
-    buttons.replaceButton.addEventListener('click', handleReplace);
+    buttons.replaceButton.addEventListener('click', () => handleReplace(currentMode));
   }
 
   if (buttons.copyButton) {
@@ -207,4 +210,24 @@ export function attachButtonEvents() {
       updateSplitModeUI(parseInt(button.getAttribute('data-split-mode')));
     });
   });
+
+  function updateButtonStates() {
+    const matchCaseButton = document.getElementById('match-case');
+    if (matchCaseButton) {
+      matchCaseButton.textContent = getMatchCaseEnabled() ? translations[getCurrentLang()].matchCaseOn : translations[getCurrentLang()].matchCaseOff;
+      matchCaseButton.style.background = getMatchCaseEnabled() ? '#28a745' : '#6c757d';
+    }
+  }
+
+  function updateModeButtons() {
+    const renameMode = document.getElementById('rename-mode');
+    const deleteMode = document.getElementById('delete-mode');
+    if (currentMode !== 'default' && renameMode && deleteMode) {
+      renameMode.style.display = 'inline-block';
+      deleteMode.style.display = 'inline-block';
+    } else if (renameMode && deleteMode) {
+      renameMode.style.display = 'none';
+      deleteMode.style.display = 'none';
+    }
+  }
 }
