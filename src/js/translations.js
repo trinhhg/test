@@ -1,16 +1,71 @@
-// src/js/translations.js
-(function () {
-  window.App = window.App || {};
+const translations = {
+  vn: {
+    appTitle: 'Tiện Ích Của Trịnh Hg',
+    contactText1: '- Gia hạn tài khoản: ',
+    settingsTab: 'Settings',
+    replaceTab: 'Replace',
+    splitTab: 'Chia Chương',
+    settingsTitle: 'Cài đặt tìm kiếm và thay thế',
+    modeLabel: 'Chọn chế độ:',
+    default: 'Mặc định',
+    addMode: 'Thêm chế độ mới',
+    copyMode: 'Sao Chép Chế Độ',
+    matchCaseOn: 'Match Case: Bật',
+    matchCaseOff: 'Match Case: Tắt',
+    findPlaceholder: 'Tìm ví dụ dấu phẩy',
+    replacePlaceholder: 'Thay thế ví dụ dấu chấm phẩy',
+    removeButton: 'Xóa',
+    addPair: 'Thêm',
+    saveSettings: 'Lưu cài đặt',
+    replaceTitle: 'Thay thế Dấu câu',
+    inputText: 'Dán văn bản của bạn vào đây...',
+    replaceButton: 'Thay thế',
+    outputText: 'Kết quả sẽ xuất hiện ở đây...',
+    copyButton: 'Sao chép',
+    splitTitle: 'Chia Chương',
+    splitInputText: 'Dán văn bản của bạn vào đây...',
+    splitButton: 'Chia Chương',
+    output1Text: 'Kết quả chương 1 sẽ xuất hiện ở đây...',
+    output2Text: 'Kết quả chương 2 sẽ xuất hiện ở đây...',
+    output3Text: 'Kết quả chương 3 sẽ xuất hiện ở đây...',
+    output4Text: 'Kết quả chương 4 sẽ xuất hiện ở đây...',
+    noPairsToSave: 'Không có cặp nào để lưu!',
+    settingsSaved: 'Đã lưu cài đặt cho chế độ "{mode}"!',
+    newModePrompt: 'Nhập tên chế độ mới:',
+    invalidModeName: 'Tên chế độ không hợp lệ hoặc đã tồn tại!',
+    modeCreated: 'Đã tạo chế độ "{mode}"!',
+    switchedMode: 'Đã chuyển sang chế độ "{mode}"',
+    noTextToReplace: 'Không có văn bản để thay thế!',
+    noPairsConfigured: 'Không có cặp tìm-thay thế nào được cấu hình!',
+    textReplaced: 'Đã thay thế văn bản thành công!',
+    textCopied: 'Đã sao chép văn bản vào clipboard!',
+    failedToCopy: 'Không thể sao chép văn bản!',
+    noTextToCopy: 'Không có văn bản để sao chép!',
+    modeDeleted: 'Đã xóa chế độ "{mode}"!',
+    renamePrompt: 'Nhập tên mới cho chế độ:',
+    renameSuccess: 'Đã đổi tên chế độ thành "{mode}"!',
+    renameError: 'Lỗi khi đổi tên chế độ!',
+    noTextToSplit: 'Không có văn bản để chia!',
+    splitSuccess: 'Đã chia chương thành công!',
+    exportSettings: 'Xuất Cài Đặt',
+    importSettings: 'Nhập Cài Đặt',
+    settingsExported: 'Đã xuất cài đặt thành công!',
+    settingsImported: 'Đã nhập cài đặt thành công!',
+    importError: 'Lỗi khi nhập cài đặt!',
+    wordCount: 'Words: {count}',
+    loginSuccess: 'Đăng nhập thành công!',
+    loginFailed: 'Đăng nhập thất bại. Vui lòng kiểm tra email/mật khẩu hoặc liên hệ admin để gia hạn.',
+    accountExpired: 'Tài khoản đã hết hạn! Vui lòng liên hệ admin để gia hạn.',
+    accountDisabled: 'Tài khoản đã bị vô hiệu hóa! Vui lòng liên hệ admin.',
+    noAccountData: 'Không tìm thấy dữ liệu tài khoản.',
+    accountCheckError: 'Lỗi khi kiểm tra tài khoản.',
+    logoutSuccess: 'Đã đăng xuất thành công!',
+    logoutText: 'Đăng xuất',
+    loading: 'Đang tải...',
+    accountDeactivated: 'Tài khoản đã bị vô hiệu hóa.',
+    updateAvailable: 'trinhhg.github.io cho biết: Trang đã có phiên bản mới. Bấm "Tải lại" hoặc nhấn F5 để cập nhật.',
+    reloadButton: 'Tải lại'
+  }
+};
 
-  App.translations = {
-    vn: {
-      appTitle: 'Tiện Ích Của Trịnh Hg',
-      contactText1: '- Gia hạn tài khoản: ',
-      settingsTab: 'Settings',
-      replaceTab: 'Replace',
-      splitTab: 'Chia Chương',
-      // ... (giữ nguyên toàn bộ translations object từ code gốc)
-      reloadButton: 'Tải lại'
-    }
-  };
-})();
+export { translations, currentLang };
