@@ -1,10 +1,14 @@
 // src/settings/modes.js
-import { translations, getCurrentLang } from '../i18n/translations.js';
+import { translations, getCurrentLang, setMatchCaseEnabled, getMatchCaseEnabled } from '../i18n/translations.js';
 import { showNotification } from '../ui/notifications.js';
 import { addPair } from './settings.js';
 
 const LOCAL_STORAGE_KEY = 'local_settings';
-let currentMode = 'default';
+export let currentMode = 'default';
+
+export function setCurrentMode(mode) {
+  currentMode = mode;
+}
 
 export function loadModes() {
   const modeSelect = document.getElementById('mode-select');
