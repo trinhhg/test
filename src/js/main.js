@@ -5,8 +5,27 @@ import { setupReplaceHandler } from './replace.js';
 import { setupSplitHandler, updateSplitModeUI } from './split.js';
 import { saveInputState, restoreInputState } from './inputState.js';
 import { checkVersionLoop, setupIdleHandlers } from './versionIdle.js';
-import { setupLoginHandler, setupLogoutHandler, startAuthStateListener } from './auth.js';
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM fully loaded');
+  try {
+    updateLanguage('vn');
+    loadModes();
+    attachButtonEvents();
+    attachTabEvents();
+    updateSplitModeUI(2);
 
+    // Sử dụng các hàm đã gán vào window
+    window.setupLoginHandler();
+    window.setupLogoutHandler();
+    window.startAuthStateListener();
+
+    setupIdleHandlers();
+    checkVersionLoop();
+  } catch (error) {
+    console.error('Lỗi trong khởi tạo:', error);
+    showNotification('Có lỗi khi khởi tạo ứng dụng, vui lòng tải lại!', 'error');
+  }
+});
 // Hàm gắn sự kiện cho các nút
 function attachButtonEvents() {
   const buttons = {
