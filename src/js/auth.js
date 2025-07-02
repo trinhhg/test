@@ -1,12 +1,4 @@
-// Import Firebase compat để dùng API kiểu cũ (v8 style)
-import firebase from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js';
-import 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js';
-import 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js';
-
-import { showNotification, showLoginUI, showMainUI, showLoadingUI, hideLoadingUI } from './ui.js';
-import { translations, currentLang } from './translations.js';
-import { saveInputState } from './inputState.js'; // Nếu bạn dùng lưu trạng thái
-// Nếu bạn không có file storage.js thì có thể comment dòng trên
+// Không dùng import firebase nữa, đã load từ <script> trong index.html
 
 // Firebase config
 const firebaseConfig = {
@@ -19,14 +11,12 @@ const firebaseConfig = {
   measurementId: "G-LNZQTM2JTD"
 };
 
-// Khởi tạo Firebase
+// Khởi tạo Firebase (global firebase từ script HTML)
 firebase.initializeApp(firebaseConfig);
 
-// Auth và Firestore
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// Đánh dấu đã hiển thị thông báo đăng nhập chưa
 let hasShownLoginSuccess = false;
 
 // Kiểm tra trạng thái tài khoản
@@ -67,13 +57,12 @@ function checkAccountStatus(uid) {
   });
 }
 
-// Theo dõi trạng thái active của tài khoản
+// Theo dõi tài khoản bị vô hiệu hóa
 function monitorAccountActiveStatus(uid) {
   db.collection("users").doc(uid).onSnapshot(doc => {
     if (!doc.exists || doc.data().active === false) {
-      console.warn('Tài khoản bị vô hiệu hóa hoặc không tồn tại');
+      alert(translations[currentLang].accountDeactivated);
       auth.signOut().then(() => {
-        alert(translations[currentLang].accountDeactivated);
         showLoginUI();
         location.replace(location.pathname + '?v=' + Date.now());
       });
@@ -81,7 +70,7 @@ function monitorAccountActiveStatus(uid) {
   });
 }
 
-// Theo dõi đăng nhập
+// Theo dõi trạng thái đăng nhập
 function startAuthStateListener() {
   showLoadingUI();
   auth.onAuthStateChanged(user => {
@@ -114,7 +103,7 @@ function startAuthStateListener() {
   });
 }
 
-// Theo dõi trạng thái tài khoản và tự reload nếu cần
+// Theo dõi trạng thái tài khoản (disabled/hết hạn)
 function startAccountStatusCheck() {
   const user = auth.currentUser;
   if (!user) return;
@@ -143,7 +132,7 @@ function startAccountStatusCheck() {
   });
 }
 
-// Xử lý đăng nhập
+// Đăng nhập
 function setupLoginHandler() {
   const form = document.getElementById('loginForm');
   if (!form) return;
@@ -170,7 +159,7 @@ function setupLoginHandler() {
   });
 }
 
-// Xử lý đăng xuất
+// Đăng xuất
 function setupLogoutHandler() {
   const link = document.getElementById('logout-link');
   if (!link) return;
@@ -189,8 +178,10 @@ function setupLogoutHandler() {
   });
 }
 
-// Xuất các hàm
-export {
+// Nếu file này KHÔNG dùng với `type="module"`, bạn không cần export
+// Nếu DÙNG trong main.js (có type="module") thì dùng export sau:
+
+window.authModule = {
   auth,
   db,
   hasShownLoginSuccess,
