@@ -1,6 +1,5 @@
 // translations.js
-
-const currentLang = localStorage.getItem('lang') || 'vn';
+let currentLang = localStorage.getItem('lang') || 'vn';
 
 const translations = {
   vn: {
@@ -70,6 +69,12 @@ const translations = {
     updateAvailable: 'trinhhg.github.io cho biết: Trang đã có phiên bản mới. Bấm "Tải lại" hoặc nhấn F5 để cập nhật.',
     reloadButton: 'Tải lại'
   }
+};
+
+// Gắn vào window để auth.js sử dụng
+window.translationsModule = {
+  translations,
+  currentLang
 };
 
 export { translations, currentLang };
