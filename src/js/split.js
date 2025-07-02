@@ -1,6 +1,7 @@
 import { translations, currentLang } from './translations.js';
 import { showNotification, updateWordCount } from './ui.js';
 import { countWords } from './utils.js';
+import { saveInputState } from './inputState.js'; // ✅ Thêm dòng này
 
 let currentSplitMode = 2;
 
@@ -30,8 +31,9 @@ function updateSplitModeUI(mode) {
       updateWordCount(id, counterId);
     }
   });
+
   console.log(`Đã reset bộ đếm từ về "Words: 0" cho tất cả các ô khi chuyển sang chế độ Chia ${mode}`);
-  saveInputState();
+  saveInputState?.(); // ✅ Đảm bảo không lỗi nếu chưa định nghĩa
 }
 
 // Xử lý sự kiện nút chia chương
@@ -92,11 +94,11 @@ function setupSplitHandler() {
       inputTextArea.value = '';
       updateWordCount('split-input-text', 'split-input-word-count');
       showNotification(translations[currentLang].splitSuccess, 'success');
-      saveInputState();
+      saveInputState?.(); // ✅ Không gây lỗi nếu chưa định nghĩa
     });
   } else {
     console.error('Không tìm thấy nút Chia Chương');
   }
 }
 
-export { updateSplitModeUI, setupSplitHandler, currentSplitMode }; 
+export { updateSplitModeUI, setupSplitHandler, currentSplitMode };
