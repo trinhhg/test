@@ -1,6 +1,7 @@
 // versionIdle.js
 import { showUpdateDialog, saveInputState } from './ui.js';
 import { translations, currentLang } from './translations.js';
+import { restoreInputState } from './inputState.js'; // Thêm nhập restoreInputState
 
 let currentVersion = null;
 const INACTIVITY_LIMIT = 1800000; // 30 phút
@@ -10,7 +11,9 @@ let lastActivity = Date.now();
 // Reset thời gian hoạt động
 function resetActivity() {
   lastActivity = Date.now();
-  saveInputState?.(); // Lưu trạng thái input mỗi khi có hoạt động
+  if (typeof saveInputState === 'function') {
+    saveInputState(); // Kiểm tra trước khi gọi
+  }
 }
 
 // Kiểm tra thời gian không hoạt động
@@ -18,8 +21,10 @@ function checkIdle() {
   const now = Date.now();
   if (now - lastActivity > INACTIVITY_LIMIT && document.visibilityState === 'visible') {
     console.log("🕒 Không hoạt động quá lâu, reload lại trang...");
-    saveInputState?.();
-    location.replace(location.pathname + '?v=' + Date.now()); // Cache-busting
+    if (typeof saveInputState === 'function') {
+      saveInputState();
+    }
+    location.replace(`${location.pathname}?v=${Date.now()}`); // Cache-busting
   }
 }
 
@@ -33,7 +38,9 @@ function setupIdleHandlers() {
     if (document.visibilityState === 'visible') {
       console.log('Tab đã trở lại visible, kiểm tra thời gian không hoạt động');
       checkIdle();
-      if (typeof restoreInputState === 'function') restoreInputState();
+      if (typeof restoreInputState === 'function') {
+        restoreInputState();
+      }
     }
   });
 
@@ -47,16 +54,22 @@ async function checkVersionLoop() {
     const versionResponse = await fetch(`${baseURL}/version.json?${Date.now()}`, {
       cache: 'no-store'
     });
-    if (!versionResponse.ok) throw new Error('Không thể tải version.json');
+    if (!versionResponse.ok) {
+      throw new Error('Không thể tải version.json');
+    }
     const versionData = await versionResponse.json();
 
     if (!currentVersion) {
       currentVersion = versionData.version;
-      console.log("📌 Phiên bản hiện tại: " + currentVersion);
+      console.log(`📌 Phiên bản hiện tại: ${currentVersion}`);
     } else if (versionData.version !== currentVersion) {
       setTimeout(() => {
-        console.log("🆕 Phát hiện phiên bản mới sau 6 phút:", versionData.version);
-        showUpdateDialog();
+        console.log(`🆕 Phát hiện phiên bản mới sau 6 phút: ${versionData.version}`);
+        if (typeof showUpdateDialog === 'function') {
+          showUpdateDialog();
+        } else {
+          console.error('showUpdateDialog không được định nghĩa');
+        }
       }, 360000); // 6 phút
       return;
     }
@@ -67,37 +80,4 @@ async function checkVersionLoop() {
   }
 }
 
-export { setupIdleHandlers, checkVersionLoop };      console.log("📌 Phiên bản hiện tại: " + currentVersion);
-    } else if (versionData.version !== currentVersion) {
-      setTimeout(() => {
-        console.log("🆕 Phát hiện phiên bản mới sau 6 phút:", versionData.version);
-        showUpdateDialog();
-      }, 360000);
-      return;
-    }
-
-    setTimeout(checkVersionLoop, 5000);
-  } catch (err) {
-    console.error('🚫 Kiểm tra phiên bản thất bại:', err);
-    setTimeout(checkVersionLoop, 5000);
-  }
-}
-
-// Gắn sự kiện theo dõi hoạt động
-function setupIdleHandlers() {
-  ['mousemove', 'click', 'keydown', 'scroll', 'touchstart'].forEach(event => {
-    document.addEventListener(event, resetActivity);
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-      console.log('Tab đã trở lại visible, kiểm tra thời gian không hoạt động');
-      checkIdle();
-      restoreInputState();
-    }
-  });
-
-  setInterval(checkIdle, CHECK_INTERVAL);
-}
-
-export { checkVersionLoop, setupIdleHandlers };
+export { setupIdleHandlers, checkVersionLoop };
