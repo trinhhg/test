@@ -1,5 +1,6 @@
 import { translations, currentLang } from './translations.js';
 import { showNotification } from './ui.js';
+import { saveInputState } from './inputState.js'; // ✅ Thêm để tránh lỗi
 
 let currentMode = 'default';
 let matchCaseEnabled = false;
@@ -9,10 +10,14 @@ const LOCAL_STORAGE_KEY = 'local_settings';
 function loadModes() {
   const modeSelect = document.getElementById('mode-select');
   if (!modeSelect) {
-    console.error('Không tìm thấy phần tử mode select');
+    console.error('Không tìm thấy phần tử mode-select');
     return;
   }
-  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
+
+  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {
+    modes: { default: { pairs: [], matchCase: false } }
+  };
+
   const modes = Object.keys(settings.modes || { default: {} });
 
   modeSelect.innerHTML = '';
@@ -22,6 +27,7 @@ function loadModes() {
     option.textContent = mode;
     modeSelect.appendChild(option);
   });
+
   modeSelect.value = currentMode;
   loadSettings();
   updateModeButtons();
@@ -30,22 +36,32 @@ function loadModes() {
 // Hàm tải cài đặt cho chế độ hiện tại
 function loadSettings() {
   console.log('Đang tải cài đặt cho chế độ:', currentMode);
-  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
-  const modeSettings = settings.modes?.[currentMode] || { pairs: [], matchCase: false };
+
+  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {
+    modes: { default: { pairs: [], matchCase: false } }
+  };
+
+  const modeSettings = settings.modes?.[currentMode] || {
+    pairs: [],
+    matchCase: false
+  };
+
   const list = document.getElementById('punctuation-list');
-  if (list) {
-    list.innerHTML = '';
-    if (!modeSettings.pairs || modeSettings.pairs.length === 0) {
-      addPair('', '');
-    } else {
-      modeSettings.pairs.slice().reverse().forEach(pair => {
-        console.log('Đang tải cặp:', pair);
-        addPair(pair.find || '', pair.replace || '');
-      });
-    }
-  } else {
+  if (!list) {
     console.error('Không tìm thấy phần tử punctuation-list');
+    return;
   }
+
+  list.innerHTML = '';
+  if (!modeSettings.pairs || modeSettings.pairs.length === 0) {
+    addPair('', '');
+  } else {
+    modeSettings.pairs.slice().reverse().forEach(pair => {
+      console.log('Đang tải cặp:', pair);
+      addPair(pair.find || '', pair.replace || '');
+    });
+  }
+
   matchCaseEnabled = modeSettings.matchCase || false;
   updateButtonStates();
   console.log('Đã cập nhật trạng thái:', { matchCaseEnabled });
@@ -91,11 +107,11 @@ function addPair(find = '', replace = '') {
   removeButton.addEventListener('click', () => {
     item.remove();
     console.log('Đã xóa cặp');
-    saveInputState();
+    saveInputState?.();
   });
 
-  findInput.addEventListener('input', saveInputState);
-  replaceInput.addEventListener('input', saveInputState);
+  findInput.addEventListener('input', () => saveInputState?.());
+  replaceInput.addEventListener('input', () => saveInputState?.());
 
   console.log('Đã thêm cặp vào DOM:', { find: findInput.value, replace: replaceInput.value });
 }
@@ -104,10 +120,12 @@ function addPair(find = '', replace = '') {
 function saveSettings() {
   const pairs = [];
   const items = document.querySelectorAll('.punctuation-item');
+
   if (items.length === 0) {
     showNotification(translations[currentLang].noPairsToSave, 'error');
     return;
   }
+
   items.forEach(item => {
     const find = item.querySelector('.find')?.value || '';
     const replace = item.querySelector('.replace')?.value || '';
@@ -115,39 +133,58 @@ function saveSettings() {
     console.log('Đang lưu cặp:', { find, replace });
   });
 
-  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
+  let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {
+    modes: { default: { pairs: [], matchCase: false } }
+  };
+
   settings.modes[currentMode] = {
-    pairs: pairs,
+    pairs,
     matchCase: matchCaseEnabled
   };
+
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
   console.log('Đã lưu cài đặt cho chế độ:', currentMode, settings);
+
   loadSettings();
   showNotification(translations[currentLang].settingsSaved.replace('{mode}', currentMode), 'success');
 }
 
-// Hàm cập nhật trạng thái nút
+// Hàm cập nhật nút Match Case
 function updateButtonStates() {
   const matchCaseButton = document.getElementById('match-case');
   if (matchCaseButton) {
-    matchCaseButton.textContent = matchCaseEnabled ? translations[currentLang].matchCaseOn : translations[currentLang].matchCaseOff;
+    matchCaseButton.textContent = matchCaseEnabled
+      ? translations[currentLang].matchCaseOn
+      : translations[currentLang].matchCaseOff;
+
     matchCaseButton.style.background = matchCaseEnabled ? '#28a745' : '#6c757d';
   } else {
     console.error('Không tìm thấy nút Match Case');
   }
 }
 
-// Hàm cập nhật nút chế độ
+// Hàm cập nhật nút rename/delete
 function updateModeButtons() {
   const renameMode = document.getElementById('rename-mode');
   const deleteMode = document.getElementById('delete-mode');
-  if (currentMode !== 'default' && renameMode && deleteMode) {
-    renameMode.style.display = 'inline-block';
-    deleteMode.style.display = 'inline-block';
-  } else if (renameMode && deleteMode) {
-    renameMode.style.display = 'none';
-    deleteMode.style.display = 'none';
+
+  if (currentMode !== 'default') {
+    if (renameMode) renameMode.style.display = 'inline-block';
+    if (deleteMode) deleteMode.style.display = 'inline-block';
+  } else {
+    if (renameMode) renameMode.style.display = 'none';
+    if (deleteMode) deleteMode.style.display = 'none';
   }
 }
 
-export { loadModes, loadSettings, addPair, saveSettings, updateButtonStates, updateModeButtons, currentMode, matchCaseEnabled, LOCAL_STORAGE_KEY };
+export {
+  loadModes,
+  loadSettings,
+  addPair,
+  saveSettings,
+  updateButtonStates,
+  updateModeButtons,
+  currentMode,
+  matchCaseEnabled,
+  LOCAL_STORAGE_KEY
+};
