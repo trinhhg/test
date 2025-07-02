@@ -1,3 +1,7 @@
+// translations.js
+
+const currentLang = localStorage.getItem('lang') || 'vn';
+
 const translations = {
   vn: {
     appTitle: 'Tiện Ích Của Trịnh Hg',
