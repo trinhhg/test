@@ -1,3 +1,4 @@
+// utils.js
 // Hàm escape HTML
 function escapeHtml(str) {
   try {
