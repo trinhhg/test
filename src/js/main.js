@@ -1,6 +1,6 @@
 import { translations, currentLang } from './translations.js';
-import { showNotification, updateLanguage, updateWordCount, updateModeButtons, updateButtonStates } from './ui.js';
-import { loadModes, loadSettings, saveSettings, addPair, currentMode, matchCaseEnabled, LOCAL_STORAGE_KEY } from './settings.js';
+import { showNotification, updateLanguage, updateWordCount } from './ui.js';
+import { loadModes, loadSettings, saveSettings, addPair, currentMode, matchCaseEnabled, LOCAL_STORAGE_KEY, updateModeButtons, updateButtonStates } from './settings.js';
 import { setupReplaceHandler } from './replace.js';
 import { setupSplitHandler, updateSplitModeUI } from './split.js';
 import { saveInputState, restoreInputState } from './inputState.js';
