@@ -43,6 +43,10 @@ function attachButtonEvents() {
     addPairButton: document.getElementById('add-pair'),
     saveSettingsButton: document.getElementById('save-settings'),
     copyButton: document.getElementById('copy-button'),
+    copyButton1: document.getElementById('copy-button1'),
+    copyButton2: document.getElementById('copy-button2'),
+    copyButton3: document.getElementById('copy-button3'),
+    copyButton4: document.getElementById('copy-button4'),
     inputText: document.getElementById('input-text'),
     outputText: document.getElementById('output-text'),
     splitInputText: document.getElementById('split-input-text'),
@@ -52,7 +56,6 @@ function attachButtonEvents() {
     output4Text: document.getElementById('output4-text'),
     exportSettingsButton: document.getElementById('export-settings'),
     importSettingsButton: document.getElementById('import-settings')
-    // Note: copyButton1 to copyButton4 are commented out as they are missing in HTML
   };
 
   if (buttons.facebookLink) {
@@ -64,7 +67,6 @@ function attachButtonEvents() {
   if (buttons.matchCaseButton) {
     buttons.matchCaseButton.addEventListener('click', () => {
       console.log('Đã nhấp vào nút Match Case');
-      // Use imported matchCaseEnabled directly
       window.matchCaseEnabled = !matchCaseEnabled;
       updateButtonStates();
       saveSettings();
@@ -80,7 +82,6 @@ function attachButtonEvents() {
           if (settings.modes[currentMode]) {
             delete settings.modes[currentMode];
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
-            // Use imported currentMode directly
             window.currentMode = 'default';
             loadModes();
             showNotification(translations[currentLang].modeDeleted.replace('{mode}', currentMode), 'success');
@@ -100,7 +101,6 @@ function attachButtonEvents() {
           settings.modes[newName] = settings.modes[currentMode];
           delete settings.modes[currentMode];
           localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
-          // Use imported currentMode directly
           window.currentMode = newName;
           loadModes();
           showNotification(translations[currentLang].renameSuccess.replace('{mode}', newName), 'success');
@@ -123,7 +123,6 @@ function attachButtonEvents() {
         }
         settings.modes[newMode] = { pairs: [], matchCase: false };
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
-        // Use imported currentMode directly
         window.currentMode = newMode;
         loadModes();
         showNotification(translations[currentLang].modeCreated.replace('{mode}', newMode), 'success');
@@ -145,7 +144,6 @@ function attachButtonEvents() {
         }
         settings.modes[newMode] = JSON.parse(JSON.stringify(settings.modes[currentMode] || { pairs: [], matchCase: false }));
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
-        // Use imported currentMode directly
         window.currentMode = newMode;
         loadModes();
         showNotification(translations[currentLang].modeCreated.replace('{mode}', newMode), 'success');
@@ -158,7 +156,6 @@ function attachButtonEvents() {
   if (buttons.modeSelect) {
     buttons.modeSelect.addEventListener('change', (e) => {
       console.log('Chế độ đã thay đổi thành:', e.target.value);
-      // Use imported currentMode directly
       window.currentMode = e.target.value;
       loadSettings();
       showNotification(translations[currentLang].switchedMode.replace('{mode}', currentMode), 'success');
@@ -223,8 +220,6 @@ function attachButtonEvents() {
     });
   }
 
-  // Commented out copyButton1 to copyButton4 as they are missing in HTML
-  /*
   if (buttons.copyButton1) {
     buttons.copyButton1.addEventListener('click', () => {
       console.log('Đã nhấp vào nút Sao chép 1');
@@ -296,7 +291,6 @@ function attachButtonEvents() {
       }
     });
   }
-  */
 
   if (buttons.exportSettingsButton) {
     buttons.exportSettingsButton.addEventListener('click', () => {
