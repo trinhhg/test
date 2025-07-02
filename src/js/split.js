@@ -1,7 +1,8 @@
+// split.js
 import { translations, currentLang } from './translations.js';
 import { showNotification, updateWordCount } from './ui.js';
 import { countWords } from './utils.js';
-import { saveInputState } from './inputState.js'; // ✅ Thêm dòng này
+import { saveInputState } from './inputState.js';
 
 let currentSplitMode = 2;
 
@@ -33,7 +34,7 @@ function updateSplitModeUI(mode) {
   });
 
   console.log(`Đã reset bộ đếm từ về "Words: 0" cho tất cả các ô khi chuyển sang chế độ Chia ${mode}`);
-  saveInputState?.(); // ✅ Đảm bảo không lỗi nếu chưa định nghĩa
+  saveInputState?.();
 }
 
 // Xử lý sự kiện nút chia chương
@@ -55,19 +56,27 @@ function setupSplitHandler() {
       }
 
       let text = inputTextArea.value;
-      const chapterRegex = /^Chương\s+(\d+)(?:::\s*(.*))?$/m;
       let chapterNum = 1;
       let chapterTitle = '';
 
-      const match = text.match(chapterRegex);
+      // Biểu thức chính quy để nhận diện tiêu đề chương
+      const chapterRegex = /^[Cc]hương\s+(\d+)(?::\s*(.*))?$/m;
+      const lines = text.split('\n');
+      let contentStartIndex = 0;
+
+      // Kiểm tra dòng đầu tiên có phải tiêu đề chương không
+      const firstLine = lines[0].trim();
+      const match = firstLine.match(chapterRegex);
       if (match) {
         chapterNum = parseInt(match[1]);
         chapterTitle = match[2] ? `: ${match[2]}` : '';
-        text = text.replace(chapterRegex, '').trim();
+        contentStartIndex = 1; // Bỏ qua dòng tiêu đề
       }
 
-      const paragraphs = text.split('\n').filter(p => p.trim());
-      const totalWords = countWords(text);
+      // Lấy nội dung chương (bỏ qua dòng tiêu đề nếu có)
+      const content = lines.slice(contentStartIndex).join('\n');
+      const paragraphs = content.split('\n').filter(p => p.trim());
+      const totalWords = countWords(content);
       const wordsPerPart = Math.floor(totalWords / currentSplitMode);
 
       let parts = [];
@@ -94,7 +103,7 @@ function setupSplitHandler() {
       inputTextArea.value = '';
       updateWordCount('split-input-text', 'split-input-word-count');
       showNotification(translations[currentLang].splitSuccess, 'success');
-      saveInputState?.(); // ✅ Không gây lỗi nếu chưa định nghĩa
+      saveInputState?.();
     });
   } else {
     console.error('Không tìm thấy nút Chia Chương');
