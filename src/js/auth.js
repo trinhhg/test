@@ -5,7 +5,7 @@ import 'https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js';
 
 import { showNotification, showLoginUI, showMainUI, showLoadingUI, hideLoadingUI } from './ui.js';
 import { translations, currentLang } from './translations.js';
-import { saveInputState } from './storage.js'; // Nếu bạn dùng lưu trạng thái
+import { saveInputState } from './inputState.js'; // Nếu bạn dùng lưu trạng thái
 // Nếu bạn không có file storage.js thì có thể comment dòng trên
 
 // Firebase config
