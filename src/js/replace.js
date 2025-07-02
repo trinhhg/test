@@ -1,9 +1,9 @@
 // replace.js
 import { translations, currentLang } from './translations.js';
 import { showNotification, updateWordCount } from './ui.js';
-import { LOCAL_STORAGE_KEY, currentMode } from './settings.js'; // Thêm currentMode
+import { LOCAL_STORAGE_KEY, currentMode } from './settings.js';
 import { escapeRegExp } from './utils.js';
-import { saveInputState } from './inputState.js'; // Thêm import saveInputState
+import { saveInputState } from './inputState.js';
 
 // Hàm thay thế văn bản
 function replaceText(inputText, pairs, matchCase) {
@@ -35,6 +35,36 @@ function setupReplaceHandler() {
       if (!inputTextArea || !inputTextArea.value) {
         showNotification(translations[currentLang].noTextToReplace, 'error');
         return;
+      }
+
+      let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
+      const modeSettings = settings.modes[currentMode] || { pairs: [], matchCase: false };
+      const pairs = modeSettings.pairs || [];
+      if (pairs.length === 0) {
+        showNotification(translations[currentLang].noPairsConfigured, 'error');
+        return;
+      }
+
+      const outputText = replaceText(inputTextArea.value, pairs, modeSettings.matchCase);
+
+      const outputTextArea = document.getElementById('output-text');
+      if (outputTextArea) {
+        outputTextArea.value = outputText;
+        inputTextArea.value = '';
+        updateWordCount('input-text', 'input-word-count');
+        updateWordCount('output-text', 'output-word-count');
+        showNotification(translations[currentLang].textReplaced, 'success');
+        saveInputState();
+      } else {
+        console.error('Không tìm thấy khu vực văn bản đầu ra');
+      }
+    });
+  } else {
+    console.error('Không tìm thấy nút Thay thế');
+  }
+}
+
+export { replaceText, setupReplaceHandler };        return;
       }
 
       let settings = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { modes: { default: { pairs: [], matchCase: false } } };
