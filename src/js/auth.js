@@ -1,4 +1,7 @@
-// Không dùng import firebase nữa, đã load từ <script> trong index.html
+// auth.js
+// Import các hàm cần thiết từ ui.js và translations.js
+import { showMainUI, showLoginUI, showLoadingUI, hideLoadingUI, showNotification } from './ui.js';
+import { translations, currentLang } from './translations.js';
 
 // Firebase config
 const firebaseConfig = {
@@ -142,6 +145,7 @@ function setupLoginHandler() {
     const email = form.querySelector('#email').value;
     const password = form.querySelector('#password').value;
 
+    showLoadingUI();
     auth.signInWithEmailAndPassword(email, password)
       .then(({ user }) => {
         checkAccountStatus(user.uid).then(valid => {
@@ -154,6 +158,7 @@ function setupLoginHandler() {
       })
       .catch(error => {
         console.error('Lỗi đăng nhập:', error);
+        hideLoadingUI();
         showNotification(translations[currentLang].loginFailed, 'error');
       });
   });
@@ -166,6 +171,7 @@ function setupLogoutHandler() {
 
   link.addEventListener('click', e => {
     e.preventDefault();
+    showLoadingUI();
     auth.signOut().then(() => {
       showLoginUI();
       showNotification(translations[currentLang].logoutSuccess, 'success');
@@ -173,14 +179,13 @@ function setupLogoutHandler() {
       location.replace(location.pathname + '?v=' + Date.now());
     }).catch(error => {
       console.error('Lỗi khi đăng xuất:', error);
+      hideLoadingUI();
       showNotification('Lỗi khi đăng xuất.', 'error');
     });
   });
 }
 
-// Nếu file này KHÔNG dùng với `type="module"`, bạn không cần export
-// Nếu DÙNG trong main.js (có type="module") thì dùng export sau:
-
+// Gắn các hàm vào window để main.js sử dụng
 window.authModule = {
   auth,
   db,
