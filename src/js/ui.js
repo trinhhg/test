@@ -1,11 +1,11 @@
+// ui.js
 import { translations } from './translations.js';
-import { loadModes, matchCaseEnabled } from './settings.js'; // ⬅️ Thêm matchCaseEnabled từ settings.js
+import { loadModes, matchCaseEnabled } from './settings.js';
 
 let currentLang = 'vn';
 let hasShownLoginSuccess = false;
 
 // ==== 1. Giao diện đăng nhập / chính / loading ====
-
 function showMainUI() {
   document.querySelector(".container").style.display = "block";
   document.querySelector(".login-container").style.display = "none";
@@ -15,7 +15,7 @@ function showMainUI() {
     hasShownLoginSuccess = true;
   }
 
-  if (typeof restoreInputState === 'function') restoreInputState(); // ⬅️ Không lỗi nếu chưa khai báo
+  if (typeof restoreInputState === 'function') restoreInputState();
 }
 
 function showLoginUI() {
@@ -40,7 +40,6 @@ function hideLoadingUI() {
 }
 
 // ==== 2. Hộp thoại cập nhật ====
-
 function showUpdateDialog() {
   const overlay = document.createElement('div');
   overlay.id = 'update-overlay';
@@ -90,7 +89,6 @@ function showUpdateDialog() {
 }
 
 // ==== 3. Thông báo ngắn ====
-
 function showNotification(message, type = 'success') {
   const container = document.getElementById('notification-container');
   if (!container) {
@@ -109,7 +107,6 @@ function showNotification(message, type = 'success') {
 }
 
 // ==== 4. Cập nhật ngôn ngữ ====
-
 function updateLanguage(lang) {
   currentLang = lang;
   document.documentElement.lang = lang;
@@ -191,7 +188,6 @@ function updateLanguage(lang) {
 }
 
 // ==== 5. Cập nhật đếm từ ====
-
 function updateWordCount(textareaId, wordCountId) {
   const text = document.getElementById(textareaId)?.value || '';
   const words = text.trim().split(/\s+/).filter(Boolean);
@@ -199,8 +195,19 @@ function updateWordCount(textareaId, wordCountId) {
   if (counter) counter.textContent = `Words: ${words.length}`;
 }
 
-// ==== 6. Export ====
+// Gắn các hàm và biến vào window.uiModule để auth.js sử dụng
+window.uiModule = {
+  showMainUI,
+  showLoginUI,
+  showLoadingUI,
+  hideLoadingUI,
+  showNotification,
+  updateLanguage,
+  currentLang,
+  hasShownLoginSuccess
+};
 
+// Export cho các module khác (như main.js)
 export {
   showMainUI,
   showLoginUI,
