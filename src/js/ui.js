@@ -1,7 +1,8 @@
 import { translations } from './translations.js';
-import { loadModes } from './settings.js';
+import { loadModes, matchCaseEnabled } from './settings.js'; // ⬅️ Thêm matchCaseEnabled từ settings.js
 
 let currentLang = 'vn';
+let hasShownLoginSuccess = false;
 
 // ==== 1. Giao diện đăng nhập / chính / loading ====
 
@@ -14,7 +15,7 @@ function showMainUI() {
     hasShownLoginSuccess = true;
   }
 
-  restoreInputState?.(); // Đảm bảo không lỗi nếu restoreInputState chưa được định nghĩa
+  if (typeof restoreInputState === 'function') restoreInputState(); // ⬅️ Không lỗi nếu chưa khai báo
 }
 
 function showLoginUI() {
@@ -74,7 +75,7 @@ function showUpdateDialog() {
     console.log('Người dùng nhấn Tải lại');
     const userConfirmed = confirm("🔄 Trang đã có phiên bản mới.\nNhấn OK hoặc bấm F5 để tải lại.");
     if (userConfirmed) {
-      saveInputState?.(); // Nếu có hàm lưu
+      if (typeof saveInputState === 'function') saveInputState();
       location.replace(location.pathname + '?v=' + Date.now());
     }
   });
@@ -147,7 +148,6 @@ function updateLanguage(lang) {
     if (elem) elem.textContent = text;
   }
 
-  // Đặt placeholder cho các ô nhập
   const placeholders = [
     ['input-text', T.inputText],
     ['output-text', T.outputText],
@@ -163,7 +163,6 @@ function updateLanguage(lang) {
     if (elem) elem.placeholder = placeholder;
   }
 
-  // Gán nội dung textNode cho contact-text1
   const contact = el('contact-text1');
   if (contact) {
     const textNode = Array.from(contact.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
@@ -174,7 +173,6 @@ function updateLanguage(lang) {
     }
   }
 
-  // Punctuation items
   document.querySelectorAll('.punctuation-item').forEach(item => {
     const findInput = item.querySelector('.find');
     const replaceInput = item.querySelector('.replace');
@@ -184,7 +182,6 @@ function updateLanguage(lang) {
     if (removeBtn) removeBtn.textContent = T.removeButton;
   });
 
-  // Reload chế độ
   const modeSelect = el('mode-select');
   if (modeSelect) {
     loadModes();
@@ -193,12 +190,13 @@ function updateLanguage(lang) {
   }
 }
 
-// ==== 5. Hàm cập nhật đếm từ ====
+// ==== 5. Cập nhật đếm từ ====
 
 function updateWordCount(textareaId, wordCountId) {
   const text = document.getElementById(textareaId)?.value || '';
   const words = text.trim().split(/\s+/).filter(Boolean);
-  document.getElementById(wordCountId).textContent = `Words: ${words.length}`;
+  const counter = document.getElementById(wordCountId);
+  if (counter) counter.textContent = `Words: ${words.length}`;
 }
 
 // ==== 6. Export ====
