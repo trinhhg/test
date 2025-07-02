@@ -36,7 +36,7 @@
       </div>
       <button type="submit" class="login-button">Đăng Nhập</button>
       <p class="forgot-text">
-        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank">Liên hệ admin để gia hạn tài khoản</a>
+        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank" id="facebook-link">Liên hệ admin để gia hạn tài khoản</a>
       </p>
       <p class="forgot-text">Giá: 4k một ngày, 25k một tuần, 60k một tháng</p>
     </form>
@@ -47,7 +47,7 @@
     <h1 id="app-title">Tiện Ích Của Trịnh Hg</h1>
     <div class="contact-info">
       <p>– Gia hạn tài khoản:
-        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank">Facebook Admin</a>
+        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank" id="facebook-link-main">Facebook Admin</a>
       </p>
       <p>- Giá: 4k một ngày, 25k một tuần, 60k một tháng</p>
       <p><a href="#" id="logout-link" style="color: black;">Đăng xuất</a></p>
@@ -71,6 +71,8 @@
         <button id="add-mode">Thêm chế độ mới</button>
         <button id="copy-mode">Sao chép</button>
         <button id="match-case">Match Case: Tắt</button>
+        <button id="delete-mode">Xóa Chế Độ</button>
+        <button id="rename-mode">Đổi Tên Chế Độ</button>
         <button id="export-settings">Xuất</button>
         <button id="import-settings">Nhập</button>
       </div>
@@ -145,6 +147,7 @@
   <div id="notification-container"></div>
 
   <!-- JS chính -->
+  <script src="/test/src/js/auth.js"></script>
   <script type="module" src="/test/src/js/main.js"></script>
 </body>
 </html>
