@@ -15,23 +15,28 @@
   <!-- CSS -->
   <link rel="stylesheet" href="/test/index.css">
   <link rel="icon" href="/test/favicon.ico" type="image/x-icon">
+
+  <!-- Firebase compat (v9) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <!-- Form đăng nhập -->
+  <!-- Giao diện đăng nhập -->
   <div class="login-container">
     <form id="loginForm">
       <h2 class="login-title">Đăng Nhập</h2>
       <div class="input-group">
         <span class="icon">📧</span>
-        <input type="email" id="email" placeholder="Email" required autocomplete="email">
+        <input type="email" id="email" placeholder="Email" required>
       </div>
       <div class="input-group">
         <span class="icon">🔒</span>
-        <input type="password" id="password" placeholder="Mật khẩu" required autocomplete="current-password">
+        <input type="password" id="password" placeholder="Mật khẩu" required>
       </div>
       <button type="submit" class="login-button">Đăng Nhập</button>
       <p class="forgot-text">
-        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank" rel="noopener noreferrer">Liên hệ admin để gia hạn tài khoản</a>
+        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank">Liên hệ admin để gia hạn tài khoản</a>
       </p>
       <p class="forgot-text">Giá: 4k một ngày, 25k một tuần, 60k một tháng</p>
     </form>
@@ -41,14 +46,14 @@
   <div class="container" style="display: none;">
     <h1 id="app-title">Tiện Ích Của Trịnh Hg</h1>
     <div class="contact-info">
-      <p id="contact-text1">
-        – Gia hạn tài khoản: 
-        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank" id="facebook-link" rel="noopener noreferrer">https://www.facebook.com/share/19eFDC5A4R/</a>
+      <p>– Gia hạn tài khoản:
+        <a href="https://www.facebook.com/share/19eFDC5A4R/" target="_blank">Facebook Admin</a>
       </p>
       <p>- Giá: 4k một ngày, 25k một tuần, 60k một tháng</p>
       <p><a href="#" id="logout-link" style="color: black;">Đăng xuất</a></p>
     </div>
 
+    <!-- Tabs -->
     <div class="tabs">
       <button class="tab-button active" data-tab="settings" id="settings-tab">Settings</button>
       <button class="tab-button" data-tab="replace" id="replace-tab">Replace</button>
@@ -57,23 +62,21 @@
 
     <!-- Tab Settings -->
     <div id="settings" class="tab-content active">
-      <h2 id="settings-title">Cài đặt tìm kiếm và thay thế</h2>
+      <h2>Cài đặt tìm kiếm và thay thế</h2>
       <div class="mode-controls">
-        <label for="mode-select" id="mode-label">Chọn chế độ:</label>
+        <label for="mode-select">Chọn chế độ:</label>
         <select id="mode-select">
           <option value="default">Mặc định</option>
         </select>
         <button id="add-mode">Thêm chế độ mới</button>
-        <button id="copy-mode">Sao Chép Chế Độ</button>
-        <button id="match-case" class="match-case-button">Match Case: Tắt</button>
-        <button id="export-settings">Xuất Cài Đặt</button>
-        <button id="import-settings">Nhập Cài Đặt</button>
-        <button id="rename-mode" class="rename-mode-button" style="display: none;">Đổi Tên</button>
-        <button id="delete-mode" class="delete-mode-button" style="display: none;">Xóa Chế Độ</button>
+        <button id="copy-mode">Sao chép</button>
+        <button id="match-case">Match Case: Tắt</button>
+        <button id="export-settings">Xuất</button>
+        <button id="import-settings">Nhập</button>
       </div>
       <div class="action-buttons">
         <button id="add-pair">Thêm</button>
-        <button id="save-settings">Lưu cài đặt</button>
+        <button id="save-settings">Lưu</button>
       </div>
       <div id="punctuation-list">
         <div class="punctuation-item">
@@ -86,24 +89,24 @@
 
     <!-- Tab Replace -->
     <div id="replace" class="tab-content">
-      <h2 id="replace-title">Thay thế Dấu câu</h2>
+      <h2>Thay thế Dấu câu</h2>
       <div class="replace-container">
         <div class="input-section">
-          <textarea id="input-text" placeholder="Dán văn bản của bạn vào đây..."></textarea>
-          <div id="input-word-count" class="word-count">Words: 0</div>
+          <textarea id="input-text" placeholder="Dán văn bản..."></textarea>
+          <div id="input-word-count">Words: 0</div>
           <button id="replace-button">Thay thế</button>
         </div>
         <div class="output-section">
-          <textarea id="output-text" readonly placeholder="Kết quả sẽ xuất hiện ở đây..."></textarea>
-          <div id="output-word-count" class="word-count">Words: 0</div>
+          <textarea id="output-text" readonly></textarea>
+          <div id="output-word-count">Words: 0</div>
           <button id="copy-button">Sao chép</button>
         </div>
       </div>
     </div>
 
-    <!-- Tab Chia Chương -->
+    <!-- Tab Split -->
     <div id="split" class="tab-content">
-      <h2 id="split-title">Chia Chương</h2>
+      <h2>Chia Chương</h2>
       <div class="mode-controls">
         <button class="split-mode-button active" data-split-mode="2">Chia 2</button>
         <button class="split-mode-button" data-split-mode="3">Chia 3</button>
@@ -111,28 +114,28 @@
       </div>
       <div class="split-container split-2">
         <div class="input-section">
-          <textarea id="split-input-text" placeholder="Dán văn bản của bạn vào đây..."></textarea>
-          <div id="split-input-word-count" class="word-count">Words: 0</div>
-          <button id="split-button">Chia Chương</button>
+          <textarea id="split-input-text" placeholder="Dán văn bản..."></textarea>
+          <div id="split-input-word-count">Words: 0</div>
+          <button id="split-button">Chia</button>
         </div>
         <div class="output-section">
-          <textarea id="output1-text" readonly placeholder="Kết quả chương 1 sẽ xuất hiện ở đây..."></textarea>
-          <div id="output1-word-count" class="word-count">Words: 0</div>
+          <textarea id="output1-text" readonly></textarea>
+          <div id="output1-word-count">Words: 0</div>
           <button id="copy-button1">Sao chép 1</button>
         </div>
         <div class="output-section">
-          <textarea id="output2-text" readonly placeholder="Kết quả chương 2 sẽ xuất hiện ở đây..."></textarea>
-          <div id="output2-word-count" class="word-count">Words: 0</div>
+          <textarea id="output2-text" readonly></textarea>
+          <div id="output2-word-count">Words: 0</div>
           <button id="copy-button2">Sao chép 2</button>
         </div>
-        <div class="output-section" id="output3-section" style="display: none;">
-          <textarea id="output3-text" readonly placeholder="Kết quả chương 3 sẽ xuất hiện ở đây..."></textarea>
-          <div id="output3-word-count" class="word-count">Words: 0</div>
+        <div class="output-section" id="output3-section" style="display:none;">
+          <textarea id="output3-text" readonly></textarea>
+          <div id="output3-word-count">Words: 0</div>
           <button id="copy-button3">Sao chép 3</button>
         </div>
-        <div class="output-section" id="output4-section" style="display: none;">
-          <textarea id="output4-text" readonly placeholder="Kết quả chương 4 sẽ xuất hiện ở đây..."></textarea>
-          <div id="output4-word-count" class="word-count">Words: 0</div>
+        <div class="output-section" id="output4-section" style="display:none;">
+          <textarea id="output4-text" readonly></textarea>
+          <div id="output4-word-count">Words: 0</div>
           <button id="copy-button4">Sao chép 4</button>
         </div>
       </div>
@@ -141,7 +144,7 @@
 
   <div id="notification-container"></div>
 
-  <!-- JavaScript chính -->
+  <!-- JS chính -->
   <script type="module" src="/test/src/js/main.js"></script>
 </body>
 </html>
